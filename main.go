@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -29,7 +30,7 @@ func main() {
 	}
 	defer f.Close()
 
-	contents := "General\n=======\n\nLearn\n=====\n"
+	contents := defaultEntry.Export()
 
 	fname := previousEntry()
 	if fname != "" {
@@ -44,6 +45,32 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+type Entry struct {
+	Sections []Section
+}
+
+type Section struct {
+	Title string
+	Body  string
+}
+
+var defaultEntry = Entry{Sections: []Section{{Title: "General"}, {Title: "Learn"}}}
+
+func (e Entry) Export() string {
+	out := ""
+	for i, s := range e.Sections {
+		if i != 0 {
+			out += "\n"
+		}
+		out += fmt.Sprintf("%s\n%s\n\n%s\n", s.Title, strings.Repeat("=", len(s.Title)), s.Body)
+	}
+	return out
+}
+
+func Import() (Entry, error) {
+	return Entry{}, nil
 }
 
 func previousEntry() string {
