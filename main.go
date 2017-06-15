@@ -69,7 +69,7 @@ func (e Entry) Export() string {
 	return out
 }
 
-func Import() (Entry, error) {
+func Import(s string) (Entry, error) {
 	return Entry{}, nil
 }
 
