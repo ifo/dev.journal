@@ -83,13 +83,12 @@ func Import(str string) (Entry, error) {
 
 	for _, l := range lines[1:] {
 		switch {
-		case l == "": // Skip empty lines.
 		// The section is finished; start a new one.
-		case l[:2] == "# " && len(strings.Replace(l, " ", "", -1)) >= 2:
+		case len(strings.Replace(l, " ", "", -1)) >= 2 && l[:2] == "# ":
 			s.Body = strings.TrimSpace(s.Body)
 			e.Sections = append(e.Sections, s)
 			s = Section{Title: l[2:]}
-		case s.Title != "":
+		default:
 			s.Body += "\n" + l
 		}
 	}
