@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -68,8 +69,35 @@ func (e Entry) Export() string {
 	return out
 }
 
-func Import(s string) (Entry, error) {
-	return Entry{}, nil
+func Import(str string) (Entry, error) {
+	if str == "" {
+		return Entry{}, fmt.Errorf("entry is empty")
+	}
+	lines := strings.Split(str, "\n")
+	if len(strings.Replace(lines[0], " ", "", -1)) < 2 || lines[0][:2] != "# " {
+		return Entry{}, fmt.Errorf("entries must start with a title")
+	}
+
+	e := Entry{}
+	s := Section{Title: lines[0][2:]} // Remove the starting "# " from the Title
+
+	for _, l := range lines[1:] {
+		switch {
+		case l == "": // Skip empty lines.
+		// The section is finished; start a new one.
+		case l[:2] == "# " && len(strings.Replace(l, " ", "", -1)) >= 2:
+			s.Body = strings.TrimSpace(s.Body)
+			e.Sections = append(e.Sections, s)
+			s = Section{Title: l[2:]}
+		case s.Title != "":
+			s.Body += l
+		}
+	}
+
+	s.Body = strings.TrimSpace(s.Body)
+	e.Sections = append(e.Sections, s)
+
+	return e, nil
 }
 
 func previousEntry() string {

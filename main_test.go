@@ -39,6 +39,10 @@ func TestEntryImport(t *testing.T) {
 	}{
 		"default entry": {In: "# General\n\n\n\n# Learn\n\n\n", E: defaultEntry, Err: nil},
 		"empty entry":   {In: "", E: Entry{}, Err: fmt.Errorf("entry is empty")},
+		"no title": {
+			In:  "not a title",
+			E:   Entry{},
+			Err: fmt.Errorf("entries must start with a title")},
 		"section with body": {
 			In:  "# Five\n\nteve\n",
 			E:   Entry{Sections: []Section{{Title: "Five", Body: "teve"}}},
@@ -46,6 +50,10 @@ func TestEntryImport(t *testing.T) {
 		"two sections with body": {
 			In:  "# Five\n\nteve\n\n# Four\n\ntoo\n",
 			E:   Entry{Sections: []Section{{Title: "Five", Body: "teve"}, {Title: "Four", Body: "too"}}},
+			Err: nil},
+		"repeated empty entries": {
+			In:  "# 1\n# 2\n# 3",
+			E:   Entry{Sections: []Section{{Title: "1"}, {Title: "2"}, {Title: "3"}}},
 			Err: nil},
 	}
 
