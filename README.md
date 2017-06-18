@@ -1,5 +1,4 @@
-dev.journal
-===========
+# dev.journal
 
 dev.journal is currently a small script that will setup a journal markdown file
 for the day. The format is always `./<date>/<date>.md`.
@@ -9,8 +8,7 @@ uses the same format as above.
 
 Configuration will be coming soon! And things may change at any time.
 
-TODO
-----
+## TODO
 
 - Add configuration
   - Possibly a .journal or journal.[json|toml|...] file?

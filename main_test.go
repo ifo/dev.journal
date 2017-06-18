@@ -13,14 +13,14 @@ func TestEntryExport(t *testing.T) {
 		E   Entry
 		Out string
 	}{
-		"default entry": {E: defaultEntry, Out: "General\n=======\n\n\n\nLearn\n=====\n\n\n"},
+		"default entry": {E: defaultEntry, Out: "# General\n\n\n\n# Learn\n\n\n"},
 		"empty entry":   {E: Entry{Sections: nil}, Out: ""},
 		"section with body": {
 			E:   Entry{Sections: []Section{{Title: "Five", Body: "teve"}}},
-			Out: "Five\n====\n\nteve\n"},
+			Out: "# Five\n\nteve\n"},
 		"two sections with body": {
 			E:   Entry{Sections: []Section{{Title: "Five", Body: "teve"}, {Title: "Four", Body: "too"}}},
-			Out: "Five\n====\n\nteve\n\nFour\n====\n\ntoo\n"},
+			Out: "# Five\n\nteve\n\n# Four\n\ntoo\n"},
 	}
 
 	for id, c := range cases {
@@ -37,14 +37,14 @@ func TestEntryImport(t *testing.T) {
 		E   Entry
 		Err error
 	}{
-		"default entry": {In: "General\n=======\n\n\n\nLearn\n=====\n\n\n", E: defaultEntry, Err: nil},
+		"default entry": {In: "# General\n\n\n\n# Learn\n\n\n", E: defaultEntry, Err: nil},
 		"empty entry":   {In: "", E: Entry{}, Err: fmt.Errorf("entry is empty")},
 		"section with body": {
-			In:  "Five\n====\n\nteve\n",
+			In:  "# Five\n\nteve\n",
 			E:   Entry{Sections: []Section{{Title: "Five", Body: "teve"}}},
 			Err: nil},
 		"two sections with body": {
-			In:  "Five\n====\n\nteve\n\nFour\n====\n\ntoo\n",
+			In:  "# Five\n\nteve\n\n# Four\n\ntoo\n",
 			E:   Entry{Sections: []Section{{Title: "Five", Body: "teve"}, {Title: "Four", Body: "too"}}},
 			Err: nil},
 	}
