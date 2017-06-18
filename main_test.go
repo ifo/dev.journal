@@ -55,6 +55,10 @@ func TestEntryImport(t *testing.T) {
 			In:  "# 1\n# 2\n# 3",
 			E:   Entry{Sections: []Section{{Title: "1"}, {Title: "2"}, {Title: "3"}}},
 			Err: nil},
+		"multiline body": {
+			In:  "# multi\n\nmultiple\nlines",
+			E:   Entry{Sections: []Section{{Title: "multi", Body: "multiple\nlines"}}},
+			Err: nil},
 	}
 
 	for id, c := range cases {

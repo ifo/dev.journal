@@ -90,7 +90,7 @@ func Import(str string) (Entry, error) {
 			e.Sections = append(e.Sections, s)
 			s = Section{Title: l[2:]}
 		case s.Title != "":
-			s.Body += l
+			s.Body += "\n" + l
 		}
 	}
 

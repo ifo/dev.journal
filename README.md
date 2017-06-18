@@ -13,5 +13,3 @@ Configuration will be coming soon! And things may change at any time.
 - Add configuration
   - Possibly a .journal or journal.[json|toml|...] file?
 - Determine decent topic defaults (better that "General" and "Learn")
-- Add parsing to allow for the manipulation of individual sections based on
-  heading.
