@@ -1,4 +1,4 @@
-package main
+package journal
 
 import (
 	"fmt"
@@ -13,7 +13,7 @@ func TestEntryExport(t *testing.T) {
 		E   Entry
 		Out string
 	}{
-		"default entry": {E: defaultEntry, Out: "# General\n\n\n\n# Learn\n\n\n"},
+		"default entry": {E: DefaultEntry, Out: "# General\n\n\n\n# Learn\n\n\n"},
 		"empty entry":   {E: Entry{Sections: nil}, Out: ""},
 		"section with body": {
 			E:   Entry{Sections: []Section{{Title: "Five", Body: "teve"}}},
@@ -37,7 +37,7 @@ func TestEntryImport(t *testing.T) {
 		E   Entry
 		Err error
 	}{
-		"default entry": {In: "# General\n\n\n\n# Learn\n\n\n", E: defaultEntry, Err: nil},
+		"default entry": {In: "# General\n\n\n\n# Learn\n\n\n", E: DefaultEntry, Err: nil},
 		"empty entry":   {In: "", E: Entry{}, Err: fmt.Errorf("entry is empty")},
 		"one char line": {In: "# a\nb\nc", E: Entry{Sections: []Section{{Title: "a", Body: "b\nc"}}}},
 		"no title": {
