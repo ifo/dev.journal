@@ -64,8 +64,8 @@ func PreviousEntry() string {
 	today := time.Now()
 	for i := 1; i <= 7; i++ {
 		y, m, d := today.AddDate(0, 0, -i).Date()
-		root := fmt.Sprintf("%d-%02d-%02d", y, m, d)
-		file := filepath.Join(root, fmt.Sprintf("%s.md", root))
+		folder := fmt.Sprintf("%d-%02d-%02d", y, m, d)
+		file := filepath.Join(folder, fmt.Sprintf("%s.md", folder))
 		if _, err := os.Stat(file); !os.IsNotExist(err) {
 			return file
 		}
