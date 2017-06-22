@@ -12,15 +12,17 @@ import (
 )
 
 func main() {
-	switch {
-	case len(os.Args) > 1 && os.Args[1] == "new":
+	if len(os.Args) == 1 {
+		fmt.Println("no command given")
+		return
+	}
+	switch os.Args[1] {
+	case "new":
 		err := MakeNewEntry()
 		if err != nil {
 			log.Fatal(err)
 		}
 		fmt.Println("new entry created")
-	default:
-		fmt.Println("no command given")
 	}
 }
 
