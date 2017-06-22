@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"time"
 
@@ -23,6 +24,19 @@ func main() {
 			log.Fatal(err)
 		}
 		fmt.Println("new entry created")
+	case "edit":
+		pe := journal.PreviousEntry()
+		fmt.Println(pe)
+		if pe == "" {
+			fmt.Println("no entry to edit")
+			return
+		}
+		cmd := exec.Command("vim", pe)
+		cmd.Stdin = os.Stdin
+		cmd.Stdout = os.Stdout
+		if err := cmd.Run(); err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 
