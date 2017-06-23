@@ -60,15 +60,19 @@ func Import(str string) (Entry, error) {
 	return e, nil
 }
 
-func PreviousEntry() string {
+func LatestEntry() string {
 	today := time.Now()
-	for i := 1; i <= 7; i++ {
-		y, m, d := today.AddDate(0, 0, -i).Date()
-		folder := fmt.Sprintf("%d-%02d-%02d", y, m, d)
+	for i := 0; i <= 7; i++ {
+		folder := DateString(today.AddDate(0, 0, -i))
 		file := filepath.Join(folder, fmt.Sprintf("%s.md", folder))
 		if _, err := os.Stat(file); !os.IsNotExist(err) {
 			return file
 		}
 	}
 	return ""
+}
+
+func DateString(t time.Time) string {
+	y, m, d := t.Date()
+	return fmt.Sprintf("%d-%02d-%02d", y, m, d)
 }

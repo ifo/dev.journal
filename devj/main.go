@@ -25,7 +25,7 @@ func main() {
 		}
 		fmt.Println("new entry created")
 	case "edit":
-		pe := journal.PreviousEntry()
+		pe := journal.LatestEntry()
 		fmt.Println(pe)
 		if pe == "" {
 			fmt.Println("no entry to edit")
@@ -41,8 +41,7 @@ func main() {
 }
 
 func MakeNewEntry() error {
-	year, month, day := time.Now().Date()
-	folder := fmt.Sprintf("%d-%02d-%02d", year, month, day)
+	folder := journal.DateString(time.Now())
 	file := fmt.Sprintf("%s.md", folder)
 
 	if _, err := os.Stat(folder); os.IsNotExist(err) {
@@ -52,15 +51,9 @@ func MakeNewEntry() error {
 		}
 	}
 
-	f, err := os.OpenFile(filepath.Join(folder, file), os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
 	contents := journal.DefaultEntry.Export()
 
-	fname := journal.PreviousEntry()
+	fname := journal.LatestEntry()
 	if fname != "" {
 		bts, err := ioutil.ReadFile(fname)
 		if err != nil {
@@ -68,6 +61,12 @@ func MakeNewEntry() error {
 		}
 		contents = string(bts)
 	}
+
+	f, err := os.OpenFile(filepath.Join(folder, file), os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
 
 	_, err = f.WriteString(contents)
 	if err != nil {
