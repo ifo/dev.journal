@@ -26,14 +26,14 @@ func main() {
 		fmt.Println("new entry created")
 	case "edit":
 		pe := journal.LatestEntry()
-		fmt.Println(pe)
 		if pe == "" {
 			fmt.Println("no entry to edit")
 			return
 		}
-		cmd := exec.Command("vim", pe)
+		cmd := exec.Command("vim", pe) // TODO: allow the editor to be configured
 		cmd.Stdin = os.Stdin
 		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
 		if err := cmd.Run(); err != nil {
 			log.Fatal(err)
 		}

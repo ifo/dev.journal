@@ -40,7 +40,7 @@ func Import(str string) (Entry, error) {
 	}
 
 	e := Entry{}
-	s := Section{Title: lines[0][2:]} // Remove the starting "# " from the Title
+	s := Section{Title: lines[0][2:]} // Remove the starting "# " from the Title.
 
 	for _, l := range lines[1:] {
 		switch {
