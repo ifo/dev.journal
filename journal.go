@@ -31,7 +31,7 @@ func (e Entry) Export() string {
 }
 
 func Import(str string) (Entry, error) {
-	if str == "" {
+	if len(str) < 3 {
 		return Entry{}, fmt.Errorf("entry is empty")
 	}
 

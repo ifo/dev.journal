@@ -39,6 +39,7 @@ func TestEntryImport(t *testing.T) {
 	}{
 		"default entry": {In: "# General\n\n\n\n# Learn\n\n\n", E: DefaultEntry, Err: nil},
 		"empty entry":   {In: "", E: Entry{}, Err: fmt.Errorf("entry is empty")},
+		"single rune":   {In: " ", E: Entry{}, Err: fmt.Errorf("entry is empty")},
 		"one char line": {In: "# a\nb\nc", E: Entry{Sections: []Section{{Title: "a", Body: "b\nc"}}}},
 		"no title": {
 			In:  "not a title",
