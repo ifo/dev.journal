@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/ifo/dev.journal"
+	"github.com/ifo/dev.journal/entry"
 )
 
 func main() {
@@ -25,7 +25,7 @@ func main() {
 		}
 		fmt.Println("new entry created")
 	case "edit":
-		pe := journal.LatestEntry()
+		pe := entry.Latest()
 		if pe == "" {
 			fmt.Println("no entry to edit")
 			return
@@ -41,7 +41,7 @@ func main() {
 }
 
 func MakeNewEntry() error {
-	folder := journal.DateString(time.Now())
+	folder := entry.DateString(time.Now())
 	file := fmt.Sprintf("%s.md", folder)
 
 	if _, err := os.Stat(folder); os.IsNotExist(err) {
@@ -51,9 +51,9 @@ func MakeNewEntry() error {
 		}
 	}
 
-	contents := journal.DefaultEntry.Export()
+	contents := entry.DefaultEntry.Export()
 
-	fname := journal.LatestEntry()
+	fname := entry.Latest()
 	if fname != "" {
 		bts, err := ioutil.ReadFile(fname)
 		if err != nil {

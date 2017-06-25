@@ -1,4 +1,4 @@
-package journal
+package entry
 
 import (
 	"fmt"
@@ -25,8 +25,8 @@ type Section struct {
 	Body  string
 }
 
-var DefaultEntry = Entry{Style: Pound, Sections: []Section{{Title: "General"}, {Title: "Learn"}}}
-var UlDefaultEntry = Entry{Style: Underline,
+var Default = Entry{Style: Pound, Sections: []Section{{Title: "General"}, {Title: "Learn"}}}
+var DefaultUnderline = Entry{Style: Underline,
 	Sections: []Section{{Title: "General"}, {Title: "Learn"}}}
 
 func (e Entry) Export() string {
@@ -131,7 +131,13 @@ func areTitle(line1, line2 string) bool {
 		len(strings.Replace(line2, "=", "", -1)) == 0
 }
 
-func LatestEntry() string {
+// Latest and DateString should probably be somewhere else, as they're the only
+// two that interact with the file system. It's probable that they'll end up in
+// the same place with other functions that interact with actual files.
+//
+// But for now this is fine.
+
+func Latest() string {
 	today := time.Now()
 	for i := 0; i <= 7; i++ {
 		folder := DateString(today.AddDate(0, 0, -i))
