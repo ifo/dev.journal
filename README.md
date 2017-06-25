@@ -8,9 +8,17 @@ uses the same format as above.
 
 Configuration will be coming soon! And things may change at any time.
 
-## TODO
+### TODO
 
 - Add configuration
-  - Possibly a .journal or journal.[json|toml|...] file?
-- Allow parsing (and printing) of the `===` and `---` underlined title markdown.
+  - ? A .journal or journal.[json|toml|...] file
+- Allow import of the `===` underlined title markdown
+- Allow export of the `===` underlined title markdown
+- Allow mixed parsing of `#` and `===` titles
+- ? Allow mixed export of # and === titles
 - Determine decent topic defaults (better that "General" and "Learn")
+
+### Done
+
+- Add parsing to allow for the manipulation of individual sections based on
+  heading
