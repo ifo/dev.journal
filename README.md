@@ -12,4 +12,5 @@ Configuration will be coming soon! And things may change at any time.
 
 - Add configuration
   - Possibly a .journal or journal.[json|toml|...] file?
+- Allow parsing (and printing) of the `===` and `---` underlined title markdown.
 - Determine decent topic defaults (better that "General" and "Learn")

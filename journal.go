@@ -34,11 +34,17 @@ func Import(str string) (Entry, error) {
 	if str == "" {
 		return Entry{}, fmt.Errorf("entry is empty")
 	}
-	lines := strings.Split(str, "\n")
-	if len(strings.Replace(lines[0], " ", "", -1)) < 2 || lines[0][:2] != "# " {
-		return Entry{}, fmt.Errorf("entries must start with a title")
-	}
 
+	if str[:2] == "# " {
+		return importPoundTitles(str)
+	} else if lines := strings.SplitN(str, "\n", 3); len(lines) > 1 && areTitle(lines[0], lines[1]) {
+		return importUnderlineTitles(str)
+	}
+	return Entry{}, fmt.Errorf("entries must start with a title")
+}
+
+func importPoundTitles(str string) (Entry, error) {
+	lines := strings.Split(str, "\n")
 	e := Entry{}
 	s := Section{Title: lines[0][2:]} // Remove the starting "# " from the Title.
 
@@ -58,6 +64,19 @@ func Import(str string) (Entry, error) {
 	e.Sections = append(e.Sections, s)
 
 	return e, nil
+}
+
+func importUnderlineTitles(str string) (Entry, error) {
+	// TODO: implement
+	return Entry{}, nil
+}
+
+// Two lines are a title if there is at least 1 non space rune on the first line
+// and the 2nd line is more than 1 "=" sign, and entirely "=" signs.
+func areTitle(line1, line2 string) bool {
+	return len(strings.Replace(line1, " ", "", -1)) > 0 &&
+		len(line2) > 0 &&
+		len(strings.Replace(line2, "=", "", -1)) == 0
 }
 
 func LatestEntry() string {
