@@ -8,8 +8,16 @@ import (
 	"time"
 )
 
+type Style int
+
+const (
+	Pound Style = iota
+	Underline
+)
+
 type Entry struct {
 	Sections []Section
+	Style    Style
 }
 
 type Section struct {
@@ -17,7 +25,9 @@ type Section struct {
 	Body  string
 }
 
-var DefaultEntry = Entry{Sections: []Section{{Title: "General"}, {Title: "Learn"}}}
+var DefaultEntry = Entry{Style: Pound, Sections: []Section{{Title: "General"}, {Title: "Learn"}}}
+var UlDefaultEntry = Entry{Style: Underline,
+	Sections: []Section{{Title: "General"}, {Title: "Learn"}}}
 
 func (e Entry) Export() string {
 	out := ""
@@ -45,7 +55,7 @@ func Import(str string) (Entry, error) {
 
 func importPoundTitles(str string) (Entry, error) {
 	lines := strings.Split(str, "\n")
-	e := Entry{}
+	e := Entry{Style: Pound}
 	s := Section{Title: lines[0][2:]} // Remove the starting "# " from the Title.
 
 	for _, l := range lines[1:] {
@@ -68,7 +78,7 @@ func importPoundTitles(str string) (Entry, error) {
 
 func importUnderlineTitles(str string) (Entry, error) {
 	lines := strings.Split(str, "\n")
-	e := Entry{}
+	e := Entry{Style: Underline}
 	s := Section{Title: strings.TrimSpace(lines[0])}
 
 	if len(lines) < 4 {
