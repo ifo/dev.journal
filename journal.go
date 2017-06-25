@@ -35,7 +35,11 @@ func (e Entry) Export() string {
 		if i != 0 {
 			out += "\n"
 		}
-		out += fmt.Sprintf("# %s\n\n%s\n", s.Title, s.Body)
+		if e.Style == Pound {
+			out += fmt.Sprintf("# %s\n\n%s\n", s.Title, s.Body)
+		} else if e.Style == Underline {
+			out += fmt.Sprintf("%s\n%s\n\n%s\n", s.Title, strings.Repeat("=", len(s.Title)), s.Body)
+		}
 	}
 	return out
 }

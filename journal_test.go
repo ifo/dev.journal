@@ -13,14 +13,26 @@ func TestEntryExport(t *testing.T) {
 		E   Entry
 		Out string
 	}{
+		// Pound titles.
 		"default entry": {E: DefaultEntry, Out: "# General\n\n\n\n# Learn\n\n\n"},
-		"empty entry":   {E: Entry{Sections: nil}, Out: ""},
+		"empty entry":   {E: Entry{Style: Pound, Sections: nil}, Out: ""},
 		"section with body": {
-			E:   Entry{Sections: []Section{{Title: "Five", Body: "teve"}}},
+			E:   Entry{Style: Pound, Sections: []Section{{Title: "Five", Body: "teve"}}},
 			Out: "# Five\n\nteve\n"},
 		"two sections with body": {
-			E:   Entry{Sections: []Section{{Title: "Five", Body: "teve"}, {Title: "Four", Body: "too"}}},
+			E: Entry{Style: Pound,
+				Sections: []Section{{Title: "Five", Body: "teve"}, {Title: "Four", Body: "too"}}},
 			Out: "# Five\n\nteve\n\n# Four\n\ntoo\n"},
+		// Underline titles.
+		"ul default entry": {E: UlDefaultEntry, Out: "General\n=======\n\n\n\nLearn\n=====\n\n\n"},
+		"ul empty entry":   {E: Entry{Style: Underline, Sections: nil}, Out: ""},
+		"ul section with body": {
+			E:   Entry{Style: Underline, Sections: []Section{{Title: "Five", Body: "teve"}}},
+			Out: "Five\n====\n\nteve\n"},
+		"ul two sections with body": {
+			E: Entry{Style: Underline,
+				Sections: []Section{{Title: "Five", Body: "teve"}, {Title: "Four", Body: "too"}}},
+			Out: "Five\n====\n\nteve\n\nFour\n====\n\ntoo\n"},
 	}
 
 	for id, c := range cases {
@@ -64,7 +76,7 @@ func TestEntryImport(t *testing.T) {
 			In:  "# multi\n\nmultiple\nlines",
 			E:   Entry{Sections: []Section{{Title: "multi", Body: "multiple\nlines"}}},
 			Err: nil},
-		// Underlined titles.
+		// Underline titles.
 		"ul default": {In: "General\n=\n\n\n\nLearn\n=\n\n\n", E: UlDefaultEntry, Err: nil},
 		"ul 1 rune line": {In: "a\n=\nb\nc",
 			E:   Entry{Style: Underline, Sections: []Section{{Title: "a", Body: "b\nc"}}},

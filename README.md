@@ -12,13 +12,13 @@ Configuration will be coming soon! And things may change at any time.
 
 - Add configuration
   - ? A .journal or journal.[json|toml|...] file
-- Allow export of the `===` underlined title markdown
 - Allow mixed parsing of `#` and `===` titles
 - ? Allow mixed export of # and === titles
 - Determine decent topic defaults (better that "General" and "Learn")
 
 ### Done
 
+- Allow export of the `===` underlined title markdown
 - Allow import of the `===` underlined title markdown
 - Add parsing to allow for the manipulation of individual sections based on
   heading
