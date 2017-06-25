@@ -67,8 +67,46 @@ func importPoundTitles(str string) (Entry, error) {
 }
 
 func importUnderlineTitles(str string) (Entry, error) {
-	// TODO: implement
-	return Entry{}, nil
+	lines := strings.Split(str, "\n")
+	e := Entry{}
+	s := Section{Title: strings.TrimSpace(lines[0])}
+
+	if len(lines) < 4 {
+		s.Body = strings.TrimSpace(strings.Join(lines[2:], "\n"))
+		e.Sections = append(e.Sections, s)
+		return e, nil
+	}
+
+	past, curr, skip := "", lines[2], false
+	for _, l := range lines[3:] {
+		past = curr
+		curr = l
+
+		if skip {
+			// We just passed a title, so move the window again.
+			skip = false
+			continue
+		}
+
+		switch {
+		// The section is finished; start a new one.
+		case areTitle(past, curr):
+			s.Body = strings.TrimSpace(s.Body)
+			e.Sections = append(e.Sections, s)
+			s = Section{Title: strings.TrimSpace(past)}
+			skip = true
+		default:
+			s.Body += "\n" + past
+		}
+	}
+
+	if !skip {
+		s.Body += "\n" + curr
+	}
+	s.Body = strings.TrimSpace(s.Body)
+	e.Sections = append(e.Sections, s)
+
+	return e, nil
 }
 
 // Two lines are a title if there is at least 1 non space rune on the first line

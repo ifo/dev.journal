@@ -37,6 +37,7 @@ func TestEntryImport(t *testing.T) {
 		E   Entry
 		Err error
 	}{
+		// Pound titles.
 		"default entry": {In: "# General\n\n\n\n# Learn\n\n\n", E: DefaultEntry, Err: nil},
 		"empty entry":   {In: "", E: Entry{}, Err: fmt.Errorf("entry is empty")},
 		"single rune":   {In: " ", E: Entry{}, Err: fmt.Errorf("entry is empty")},
@@ -59,6 +60,26 @@ func TestEntryImport(t *testing.T) {
 			Err: nil},
 		"multiline body": {
 			In:  "# multi\n\nmultiple\nlines",
+			E:   Entry{Sections: []Section{{Title: "multi", Body: "multiple\nlines"}}},
+			Err: nil},
+		// Underlined titles.
+		"ul default":     {In: "General\n=\n\n\n\nLearn\n=\n\n\n", E: DefaultEntry, Err: nil},
+		"ul 1 rune line": {In: "a\n=\nb\nc", E: Entry{Sections: []Section{{Title: "a", Body: "b\nc"}}}},
+		"ul 3 lines":     {In: "a\n=\na", E: Entry{Sections: []Section{{Title: "a", Body: "a"}}}},
+		"ul section with body": {
+			In:  "Five\n=\n\nteve\n",
+			E:   Entry{Sections: []Section{{Title: "Five", Body: "teve"}}},
+			Err: nil},
+		"ul two sections with body": {
+			In:  "Five\n=\n\nteve\n\nFour\n=\n\ntoo\n",
+			E:   Entry{Sections: []Section{{Title: "Five", Body: "teve"}, {Title: "Four", Body: "too"}}},
+			Err: nil},
+		"ul repeated empty entries": {
+			In:  "1\n=\n2\n=\n3\n=",
+			E:   Entry{Sections: []Section{{Title: "1"}, {Title: "2"}, {Title: "3"}}},
+			Err: nil},
+		"ul multiline body": {
+			In:  "multi\n=\n\nmultiple\nlines",
 			E:   Entry{Sections: []Section{{Title: "multi", Body: "multiple\nlines"}}},
 			Err: nil},
 	}
