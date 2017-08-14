@@ -2,10 +2,7 @@ package entry
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
 	"strings"
-	"time"
 )
 
 type Style int
@@ -129,27 +126,4 @@ func areTitle(line1, line2 string) bool {
 	return len(strings.Replace(line1, " ", "", -1)) > 0 &&
 		len(line2) > 0 &&
 		len(strings.Replace(line2, "=", "", -1)) == 0
-}
-
-// Latest and DateString should probably be somewhere else, as they're the only
-// two that interact with the file system. It's probable that they'll end up in
-// the same place with other functions that interact with actual files.
-//
-// But for now this is fine.
-
-func Latest() string {
-	today := time.Now()
-	for i := 0; i <= 7; i++ {
-		folder := DateString(today.AddDate(0, 0, -i))
-		file := filepath.Join(folder, fmt.Sprintf("%s.md", folder))
-		if _, err := os.Stat(file); !os.IsNotExist(err) {
-			return file
-		}
-	}
-	return ""
-}
-
-func DateString(t time.Time) string {
-	y, m, d := t.Date()
-	return fmt.Sprintf("%d-%02d-%02d", y, m, d)
 }
