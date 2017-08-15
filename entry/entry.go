@@ -13,13 +13,18 @@ const (
 )
 
 type Entry struct {
-	Sections []Section
-	Style    Style
+	Sections []Section         `json:"sections"`
+	Style    Style             `json:"style"`
+	Files    map[string]string `json:"files"`
 }
 
 type Section struct {
-	Title string
-	Body  string
+	Title string `json:"title"`
+	Body  string `json:"body"`
+}
+
+type Config struct {
+	ExportableSections map[string]struct{} `json:"exportable_sections"`
 }
 
 var Default = Entry{Style: Pound, Sections: []Section{{Title: "General"}, {Title: "Learn"}}}
