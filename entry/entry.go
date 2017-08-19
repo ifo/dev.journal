@@ -13,9 +13,10 @@ const (
 )
 
 type Entry struct {
-	Sections []Section         `json:"sections"`
-	Style    Style             `json:"style"`
-	Files    map[string]string `json:"files"`
+	Sections    []Section           `json:"sections"`
+	Style       Style               `json:"style"`
+	PublicFiles map[string][]byte   `json:"files"`
+	FileNames   map[string]struct{} `json:"-"`
 }
 
 type Section struct {
@@ -127,4 +128,33 @@ func areTitle(line1, line2 string) bool {
 	return len(strings.Replace(line1, " ", "", -1)) > 0 &&
 		len(line2) > 0 &&
 		len(strings.Replace(line2, "=", "", -1)) == 0
+}
+
+func (e *Entry) ImportFiles(pubSections map[string]struct{}, readFile func(string) ([]byte, error)) error {
+	publicFiles := e.publicFileList(pubSections)
+	fileMap := map[string][]byte{}
+	for _, f := range publicFiles {
+		data, err := readFile(f)
+		if err != nil {
+			return err
+		}
+		fileMap[f] = data
+	}
+	e.PublicFiles = fileMap
+	return nil
+}
+
+func (e Entry) publicFileList(pubSections map[string]struct{}) []string {
+	var expFileName []string
+	for _, s := range e.Sections {
+		if _, ok := pubSections[s.Title]; !ok {
+			continue
+		}
+		for name, _ := range e.FileNames {
+			if strings.Contains(s.Body, name) {
+				expFileName = append(expFileName, name)
+			}
+		}
+	}
+	return expFileName
 }
