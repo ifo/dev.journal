@@ -41,3 +41,20 @@ func ReadConfig() (*entry.Config, error) {
 	err = json.Unmarshal(bts, &conf)
 	return conf, err
 }
+
+func ListFiles(dir string) ([]string, error) {
+	files, err := ioutil.ReadDir(dir)
+	if err != nil {
+		return nil, err
+	}
+
+	var fileList []string
+	for _, f := range files {
+		fileList = append(fileList, f.Name())
+	}
+	return fileList, nil
+}
+
+func ReadFile(file string) ([]byte, error) {
+	return ioutil.ReadFile(file)
+}
