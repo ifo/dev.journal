@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/ifo/dev.journal/entry"
@@ -19,7 +20,7 @@ func main() {
 		fmt.Println("no command given")
 		return
 	}
-	switch os.Args[1] {
+	switch strings.ToLower(os.Args[1]) {
 	case "new":
 		err := MakeNewEntry()
 		if err != nil {
