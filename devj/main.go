@@ -40,6 +40,14 @@ func main() {
 		if err := cmd.Run(); err != nil {
 			log.Fatal(err)
 		}
+	case "viewconfig":
+		conf, err := ReadConfig()
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(conf)
+	default:
+		fmt.Println("unknown command")
 	}
 }
 
@@ -80,7 +88,7 @@ func MakeNewEntry() error {
 }
 
 type Config struct {
-	PublicSections map[string]struct{} `json:"public_sections"`
+	PublicSections map[string]interface{} `json:"public_sections"`
 }
 
 func ReadConfig() (*Config, error) {
