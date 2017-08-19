@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -75,4 +76,19 @@ func MakeNewEntry() error {
 	}
 
 	return nil
+}
+
+type Config struct {
+	PublicSections map[string]struct{} `json:"public_sections"`
+}
+
+func ReadConfig() (*Config, error) {
+	bts, err := ioutil.ReadFile(".devj")
+	if err != nil {
+		return nil, err
+	}
+
+	var conf *Config
+	err = json.Unmarshal(bts, &conf)
+	return conf, err
 }

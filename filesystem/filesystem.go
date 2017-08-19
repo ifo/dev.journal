@@ -1,14 +1,11 @@
 package filesystem
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
-
-	"github.com/ifo/dev.journal/entry"
 )
 
 func Latest() string {
@@ -29,17 +26,6 @@ func Latest() string {
 func DateString(t time.Time) string {
 	y, m, d := t.Date()
 	return fmt.Sprintf("%d-%02d-%02d", y, m, d)
-}
-
-func ReadConfig() (*entry.Config, error) {
-	bts, err := ioutil.ReadFile(".devj")
-	if err != nil {
-		return nil, err
-	}
-
-	var conf *entry.Config
-	err = json.Unmarshal(bts, &conf)
-	return conf, err
 }
 
 func ListFiles(dir string) ([]string, error) {

@@ -23,10 +23,6 @@ type Section struct {
 	Body  string `json:"body"`
 }
 
-type Config struct {
-	ExportableSections map[string]struct{} `json:"exportable_sections"`
-}
-
 var Default = Entry{Style: Pound, Sections: []Section{{Title: "General"}, {Title: "Learn"}}}
 var DefaultUnderline = Entry{Style: Underline,
 	Sections: []Section{{Title: "General"}, {Title: "Learn"}}}
