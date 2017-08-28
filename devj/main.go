@@ -88,6 +88,10 @@ func MakeNewEntry() error {
 }
 
 type Config struct {
+	PublicSections map[string]struct{} `json:"public_sections"`
+}
+
+type lenientConfig struct {
 	PublicSections map[string]interface{} `json:"public_sections"`
 }
 
@@ -100,4 +104,17 @@ func ReadConfig() (*Config, error) {
 	var conf *Config
 	err = json.Unmarshal(bts, &conf)
 	return conf, err
+}
+
+func (c *Config) UnmarshalJSON(buf []byte) error {
+	lc := lenientConfig{}
+	err := json.Unmarshal(buf, &lc)
+	if err != nil {
+		return err
+	}
+	c.PublicSections = map[string]struct{}{}
+	for k, _ := range lc.PublicSections {
+		c.PublicSections[k] = struct{}{}
+	}
+	return nil
 }
