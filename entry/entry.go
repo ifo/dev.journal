@@ -1,6 +1,7 @@
 package entry
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 )
@@ -22,6 +23,33 @@ type Entry struct {
 type Section struct {
 	Title string `json:"title"`
 	Body  string `json:"body"`
+}
+
+// Import Style as "underline" or "pound".
+func (s *Style) UnmarshalJSON(buf []byte) error {
+	str := ""
+	err := json.Unmarshal(buf, &str)
+	if err != nil {
+		return err
+	}
+	switch strings.ToLower(str) {
+	case "underline":
+		(*s) = Underline
+	default:
+		(*s) = Pound
+	}
+	return nil
+}
+
+// Export Style as "pound" or "underline".
+func (s *Style) MarshalJSON() ([]byte, error) {
+	switch *s {
+	case Pound:
+		return json.Marshal("pound")
+	case Underline:
+		return json.Marshal("underline")
+	}
+	return nil, fmt.Errorf("Unrecognized Style: %+v", s)
 }
 
 var Default = Entry{Style: Pound, Sections: []Section{{Title: "General"}, {Title: "Learn"}}}
