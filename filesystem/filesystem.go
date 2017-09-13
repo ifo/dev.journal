@@ -41,6 +41,22 @@ func ListFiles(dir string) ([]string, error) {
 	return fileList, nil
 }
 
+func ListDirs(dir string) ([]string, error) {
+	files, err := ioutil.ReadDir(dir)
+	if err != nil {
+		return nil, err
+	}
+
+	var fileList []string
+	for _, f := range files {
+		if !f.IsDir() {
+			continue
+		}
+		fileList = append(fileList, f.Name())
+	}
+	return fileList, nil
+}
+
 func ReadFile(file string) ([]byte, error) {
 	return ioutil.ReadFile(file)
 }

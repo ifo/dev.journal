@@ -3,6 +3,7 @@ package entry
 import (
 	"encoding/json"
 	"fmt"
+	"path/filepath"
 	"strings"
 )
 
@@ -12,6 +13,11 @@ const (
 	Pound Style = iota
 	Underline
 )
+
+// Journal is a map of Entries where they key is the string of the date the Entry was written.
+type Journal struct {
+	Entries map[string]Entry `json:"entries"`
+}
 
 type Entry struct {
 	Sections    []Section           `json:"sections"`
@@ -158,11 +164,15 @@ func areTitle(line1, line2 string) bool {
 		len(strings.Replace(line2, "=", "", -1)) == 0
 }
 
-func (e *Entry) ImportFiles(pubSections map[string]struct{}, readFile func(string) ([]byte, error)) error {
+func (e *Entry) ImportFiles(
+	pubSections map[string]struct{},
+	basePath string,
+	readFile func(string) ([]byte, error)) error {
+
 	publicFiles := e.publicFileList(pubSections)
 	fileMap := map[string][]byte{}
 	for _, f := range publicFiles {
-		data, err := readFile(f)
+		data, err := readFile(filepath.Join(basePath, f))
 		if err != nil {
 			return err
 		}
