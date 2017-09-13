@@ -1,0 +1,6 @@
+# Folders
+logs
+journals
+
+# Scripts
+*.sh
