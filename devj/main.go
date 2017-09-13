@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -27,6 +29,7 @@ func main() {
 			log.Fatal(err)
 		}
 		fmt.Println("new entry created")
+
 	case "edit":
 		pe := filesystem.Latest()
 		if pe == "" {
@@ -40,12 +43,47 @@ func main() {
 		if err := cmd.Run(); err != nil {
 			log.Fatal(err)
 		}
+
+	case "export":
+		conf, err := ReadConfig()
+		if err != nil {
+			log.Fatal(err)
+		}
+		jrn, err := conf.ImportJournal(".")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		url := os.Args[2]
+		user := os.Args[3]
+		pass := os.Args[4]
+		if user == "" || pass == "" {
+			log.Fatal("need both url, user and password")
+		}
+
+		body, err := json.Marshal(jrn)
+		if err != nil {
+			log.Fatal(err)
+		}
+		req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(body))
+		if err != nil {
+			log.Fatal(err)
+		}
+		req.SetBasicAuth(user, pass)
+		req.Header.Set("Content-Type", "text/plain")
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("post finished with status %d\n", resp.StatusCode)
+
 	case "viewconfig":
 		conf, err := ReadConfig()
 		if err != nil {
 			log.Fatal(err)
 		}
 		fmt.Println(conf)
+
 	default:
 		fmt.Println("unknown command")
 	}
@@ -117,4 +155,40 @@ func (c *Config) UnmarshalJSON(buf []byte) error {
 		c.PublicSections[k] = struct{}{}
 	}
 	return nil
+}
+
+func (c *Config) ImportJournal(basePath string) (*entry.Journal, error) {
+	entries, err := filesystem.ListDirs(basePath)
+	if err != nil {
+		return nil, err
+	}
+	out := &entry.Journal{Entries: map[string]entry.Entry{}}
+	for _, date := range entries {
+		entryDir := filepath.Join(basePath, date)
+		rawEntry, err := filesystem.ReadFile(filepath.Join(entryDir, fmt.Sprintf("%s.md", date)))
+		if err != nil {
+			return nil, err
+		}
+
+		e, err := entry.ImportPublic(string(rawEntry), c.PublicSections)
+		if err != nil {
+			return nil, err
+		}
+
+		files, err := filesystem.ListFiles(entryDir)
+		if err != nil {
+			return nil, err
+		}
+		e.FileNames = map[string]struct{}{}
+		for _, name := range files {
+			e.FileNames[name] = struct{}{}
+		}
+
+		err = e.ImportFiles(c.PublicSections, entryDir, filesystem.ReadFile)
+		if err != nil {
+			return nil, err
+		}
+		out.Entries[date] = e
+	}
+	return out, nil
 }

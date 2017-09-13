@@ -83,14 +83,27 @@ func Import(str string) (Entry, error) {
 	}
 
 	if str[:2] == "# " {
-		return importPoundTitles(str)
+		return importPoundTitles(str, nil)
 	} else if lines := strings.SplitN(str, "\n", 3); len(lines) > 1 && areTitle(lines[0], lines[1]) {
-		return importUnderlineTitles(str)
+		return importUnderlineTitles(str, nil)
 	}
 	return Entry{}, fmt.Errorf("entries must start with a title")
 }
 
-func importPoundTitles(str string) (Entry, error) {
+func ImportPublic(str string, pubSections map[string]struct{}) (Entry, error) {
+	if len(str) < 3 {
+		return Entry{}, fmt.Errorf("entry is empty")
+	}
+
+	if str[:2] == "# " {
+		return importPoundTitles(str, pubSections)
+	} else if lines := strings.SplitN(str, "\n", 3); len(lines) > 1 && areTitle(lines[0], lines[1]) {
+		return importUnderlineTitles(str, pubSections)
+	}
+	return Entry{}, fmt.Errorf("entries must start with a title")
+}
+
+func importPoundTitles(str string, pubSections map[string]struct{}) (Entry, error) {
 	lines := strings.Split(str, "\n")
 	e := Entry{Style: Pound}
 	s := Section{Title: lines[0][2:]} // Remove the starting "# " from the Title.
@@ -100,7 +113,9 @@ func importPoundTitles(str string) (Entry, error) {
 		// The section is finished; start a new one.
 		case len(strings.Replace(l, " ", "", -1)) >= 2 && l[:2] == "# ":
 			s.Body = strings.TrimSpace(s.Body)
-			e.Sections = append(e.Sections, s)
+			if _, ok := pubSections[strings.ToLower(s.Title)]; pubSections == nil || ok {
+				e.Sections = append(e.Sections, s)
+			}
 			s = Section{Title: l[2:]}
 		default:
 			s.Body += "\n" + l
@@ -108,19 +123,23 @@ func importPoundTitles(str string) (Entry, error) {
 	}
 
 	s.Body = strings.TrimSpace(s.Body)
-	e.Sections = append(e.Sections, s)
+	if _, ok := pubSections[strings.ToLower(s.Title)]; pubSections == nil || ok {
+		e.Sections = append(e.Sections, s)
+	}
 
 	return e, nil
 }
 
-func importUnderlineTitles(str string) (Entry, error) {
+func importUnderlineTitles(str string, pubSections map[string]struct{}) (Entry, error) {
 	lines := strings.Split(str, "\n")
 	e := Entry{Style: Underline}
 	s := Section{Title: strings.TrimSpace(lines[0])}
 
 	if len(lines) < 4 {
 		s.Body = strings.TrimSpace(strings.Join(lines[2:], "\n"))
-		e.Sections = append(e.Sections, s)
+		if _, ok := pubSections[strings.ToLower(s.Title)]; pubSections == nil || ok {
+			e.Sections = append(e.Sections, s)
+		}
 		return e, nil
 	}
 
@@ -139,7 +158,9 @@ func importUnderlineTitles(str string) (Entry, error) {
 		// The section is finished; start a new one.
 		case areTitle(past, curr):
 			s.Body = strings.TrimSpace(s.Body)
-			e.Sections = append(e.Sections, s)
+			if _, ok := pubSections[strings.ToLower(s.Title)]; pubSections == nil || ok {
+				e.Sections = append(e.Sections, s)
+			}
 			s = Section{Title: strings.TrimSpace(past)}
 			skip = true
 		default:
@@ -151,7 +172,9 @@ func importUnderlineTitles(str string) (Entry, error) {
 		s.Body += "\n" + curr
 	}
 	s.Body = strings.TrimSpace(s.Body)
-	e.Sections = append(e.Sections, s)
+	if _, ok := pubSections[strings.ToLower(s.Title)]; pubSections == nil || ok {
+		e.Sections = append(e.Sections, s)
+	}
 
 	return e, nil
 }
