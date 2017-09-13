@@ -34,16 +34,16 @@ func (s *Style) UnmarshalJSON(buf []byte) error {
 	}
 	switch strings.ToLower(str) {
 	case "underline":
-		(*s) = Underline
+		*s = Underline
 	default:
-		(*s) = Pound
+		*s = Pound
 	}
 	return nil
 }
 
 // Export Style as "pound" or "underline".
-func (s *Style) MarshalJSON() ([]byte, error) {
-	switch *s {
+func (s Style) MarshalJSON() ([]byte, error) {
+	switch s {
 	case Pound:
 		return json.Marshal("pound")
 	case Underline:
@@ -173,16 +173,16 @@ func (e *Entry) ImportFiles(pubSections map[string]struct{}, readFile func(strin
 }
 
 func (e Entry) publicFileList(pubSections map[string]struct{}) []string {
-	var expFileName []string
+	var expFileList []string
 	for _, s := range e.Sections {
-		if _, ok := pubSections[s.Title]; !ok {
+		if _, ok := pubSections[strings.ToLower(s.Title)]; !ok {
 			continue
 		}
 		for name, _ := range e.FileNames {
 			if strings.Contains(s.Body, name) {
-				expFileName = append(expFileName, name)
+				expFileList = append(expFileList, name)
 			}
 		}
 	}
-	return expFileName
+	return expFileList
 }
