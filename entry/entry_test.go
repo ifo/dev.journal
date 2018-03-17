@@ -14,7 +14,7 @@ func TestEntryExport(t *testing.T) {
 		Out string
 	}{
 		// Pound titles.
-		"default entry": {E: Default, Out: "# General\n\n\n\n# Learn\n\n\n"},
+		"default entry": {E: Default, Out: "# Do\n\n\n\n# Learn\n\n\n"},
 		"empty entry":   {E: Entry{Style: Pound, Sections: nil}, Out: ""},
 		"section with body": {
 			E:   Entry{Style: Pound, Sections: []Section{{Title: "Five", Body: "teve"}}},
@@ -24,7 +24,7 @@ func TestEntryExport(t *testing.T) {
 				Sections: []Section{{Title: "Five", Body: "teve"}, {Title: "Four", Body: "too"}}},
 			Out: "# Five\n\nteve\n\n# Four\n\ntoo\n"},
 		// Underline titles.
-		"ul default entry": {E: DefaultUnderline, Out: "General\n=======\n\n\n\nLearn\n=====\n\n\n"},
+		"ul default entry": {E: DefaultUnderline, Out: "Do\n==\n\n\n\nLearn\n=====\n\n\n"},
 		"ul empty entry":   {E: Entry{Style: Underline, Sections: nil}, Out: ""},
 		"ul section with body": {
 			E:   Entry{Style: Underline, Sections: []Section{{Title: "Five", Body: "teve"}}},
@@ -50,7 +50,7 @@ func TestEntryImport(t *testing.T) {
 		Err error
 	}{
 		// Pound titles.
-		"default entry": {In: "# General\n\n\n\n# Learn\n\n\n", E: Default, Err: nil},
+		"default entry": {In: "# Do\n\n\n\n# Learn\n\n\n", E: Default, Err: nil},
 		"empty entry":   {In: "", E: Entry{}, Err: fmt.Errorf("entry is empty")},
 		"single rune":   {In: " ", E: Entry{}, Err: fmt.Errorf("entry is empty")},
 		"one char line": {In: "# a\nb\nc",
@@ -77,7 +77,7 @@ func TestEntryImport(t *testing.T) {
 			E:   Entry{Sections: []Section{{Title: "multi", Body: "multiple\nlines"}}},
 			Err: nil},
 		// Underline titles.
-		"ul default": {In: "General\n=\n\n\n\nLearn\n=\n\n\n", E: DefaultUnderline, Err: nil},
+		"ul default": {In: "Do\n=\n\n\n\nLearn\n=\n\n\n", E: DefaultUnderline, Err: nil},
 		"ul 1 rune line": {In: "a\n=\nb\nc",
 			E:   Entry{Style: Underline, Sections: []Section{{Title: "a", Body: "b\nc"}}},
 			Err: nil},

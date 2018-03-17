@@ -58,9 +58,9 @@ func (s Style) MarshalJSON() ([]byte, error) {
 	return nil, fmt.Errorf("Unrecognized Style: %+v", s)
 }
 
-var Default = Entry{Style: Pound, Sections: []Section{{Title: "General"}, {Title: "Learn"}}}
+var Default = Entry{Style: Pound, Sections: []Section{{Title: "Do"}, {Title: "Learn"}}}
 var DefaultUnderline = Entry{Style: Underline,
-	Sections: []Section{{Title: "General"}, {Title: "Learn"}}}
+	Sections: []Section{{Title: "Do"}, {Title: "Learn"}}}
 
 func (e Entry) Export() string {
 	out := ""
