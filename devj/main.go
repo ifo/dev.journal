@@ -22,6 +22,12 @@ func main() {
 		fmt.Println("no command given")
 		return
 	}
+
+	conf, err := ReadConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	switch strings.ToLower(os.Args[1]) {
 	case "new":
 		err := MakeNewEntry()
@@ -36,7 +42,7 @@ func main() {
 			fmt.Println("no entry to edit")
 			return
 		}
-		cmd := exec.Command("vim", pe) // TODO: allow the editor to be configured
+		cmd := exec.Command(conf.EditorCommand, pe)
 		cmd.Stdin = os.Stdin
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
@@ -45,10 +51,6 @@ func main() {
 		}
 
 	case "export":
-		conf, err := ReadConfig()
-		if err != nil {
-			log.Fatal(err)
-		}
 		jrn, err := conf.ImportJournal(".")
 		if err != nil {
 			log.Fatal(err)
@@ -78,10 +80,6 @@ func main() {
 		fmt.Printf("post finished with status %d\n", resp.StatusCode)
 
 	case "viewconfig":
-		conf, err := ReadConfig()
-		if err != nil {
-			log.Fatal(err)
-		}
 		fmt.Println(conf)
 
 	default:
@@ -127,10 +125,12 @@ func MakeNewEntry() error {
 
 type Config struct {
 	PublicSections map[string]struct{} `json:"public_sections"`
+	EditorCommand  string              `json:"editor_command"`
 }
 
 type lenientConfig struct {
 	PublicSections map[string]interface{} `json:"public_sections"`
+	EditorCommand  string                 `json:"editor_command"`
 }
 
 func ReadConfig() (*Config, error) {
@@ -149,6 +149,10 @@ func (c *Config) UnmarshalJSON(buf []byte) error {
 	err := json.Unmarshal(buf, &lc)
 	if err != nil {
 		return err
+	}
+	c.EditorCommand = "vim"
+	if lc.EditorCommand != "" {
+		c.EditorCommand = lc.EditorCommand
 	}
 	c.PublicSections = map[string]struct{}{}
 	for k, _ := range lc.PublicSections {
