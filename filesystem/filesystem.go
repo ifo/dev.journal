@@ -3,24 +3,25 @@ package filesystem
 import (
 	"fmt"
 	"io/ioutil"
-	"os"
 	"path/filepath"
+	"regexp"
 	"time"
 )
 
 func Latest() string {
-	// TODO: handle the following cases:
-	// - There has not been an entry for more than 7 days
-	// - There are no files yet
-	today := time.Now()
-	for i := 0; i <= 7; i++ {
-		folder := DateString(today.AddDate(0, 0, -i))
-		file := filepath.Join(folder, fmt.Sprintf("%s.md", folder))
-		if _, err := os.Stat(file); !os.IsNotExist(err) {
-			return file
+	files, err := ioutil.ReadDir("./")
+	if err != nil {
+		return ""
+	}
+
+	regex := regexp.MustCompile(`\d{4}-\d{2}-\d{2}`)
+	lastDirMatch := ""
+	for _, f := range files {
+		if f.IsDir() && regex.MatchString(f.Name()) {
+			lastDirMatch = f.Name()
 		}
 	}
-	return ""
+	return filepath.Join(lastDirMatch, fmt.Sprintf("%s.md", lastDirMatch))
 }
 
 func DateString(t time.Time) string {
