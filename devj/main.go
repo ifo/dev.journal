@@ -62,6 +62,9 @@ func main() {
 		if user == "" || pass == "" {
 			log.Fatal("need both url, user and password")
 		}
+		if !strings.HasPrefix(url, "https://") {
+			log.Fatal(`the url must use https (so must start with "https://")`)
+		}
 
 		body, err := json.Marshal(jrn)
 		if err != nil {
