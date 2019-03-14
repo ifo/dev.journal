@@ -94,17 +94,10 @@ func MakeNewEntry() error {
 	folder := filesystem.DateString(time.Now())
 	file := fmt.Sprintf("%s.md", folder)
 
-	if _, err := os.Stat(folder); os.IsNotExist(err) {
-		err = os.Mkdir(folder, os.ModePerm)
-		if err != nil {
-			return err
-		}
-	}
-
 	contents := entry.Default.Export()
 
-	fname := filesystem.Latest()
-	if fname != "" {
+	// Overwrite contents with the last journal, to give a better starting journal.
+	if fname := filesystem.Latest() {
 		bts, err := ioutil.ReadFile(fname)
 		if err != nil {
 			return err
@@ -112,16 +105,9 @@ func MakeNewEntry() error {
 		contents = string(bts)
 	}
 
-	f, err := os.OpenFile(filepath.Join(folder, file), os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	_, err = f.WriteString(contents)
-	if err != nil {
+	if err := filesystem.EnsureFolderExists(folder); err != nil {
 		return err
 	}
 
-	return nil
+	return filesystem.WriteFile(contents, filepath.Join(folder, file))
 }

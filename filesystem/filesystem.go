@@ -3,6 +3,7 @@ package filesystem
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"regexp"
 	"time"
@@ -64,4 +65,22 @@ func ListDirs(dir string) ([]string, error) {
 
 func ReadFile(file string) ([]byte, error) {
 	return ioutil.ReadFile(file)
+}
+
+func EnsureFolderExists(folder string) error {
+	if _, err := os.Stat(folder); os.IsNotExist(err) {
+		err = os.Mkdir(folder, os.ModePerm)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func WriteFile(s string, path string) error {
+	if _, err := os.Stat(path); !os.IsNotExist(err) {
+		return fmt.Errorf("file at path: %s already exists", path)
+	}
+
+	return ioutil.WriteFile(path, []byte(s), 0644)
 }
