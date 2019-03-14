@@ -21,7 +21,11 @@ func Latest() string {
 			lastDirMatch = f.Name()
 		}
 	}
-	return filepath.Join(lastDirMatch, fmt.Sprintf("%s.md", lastDirMatch))
+
+	if lastDirMatch != "" {
+		return filepath.Join(lastDirMatch, fmt.Sprintf("%s.md", lastDirMatch))
+	}
+	return ""
 }
 
 func DateString(t time.Time) string {
