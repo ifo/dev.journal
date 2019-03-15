@@ -97,7 +97,7 @@ func MakeNewEntry() error {
 	contents := entry.Default.Export()
 
 	// Overwrite contents with the last journal, to give a better starting journal.
-	if fname := filesystem.Latest() {
+	if fname := filesystem.Latest(); fname != "" {
 		bts, err := ioutil.ReadFile(fname)
 		if err != nil {
 			return err
