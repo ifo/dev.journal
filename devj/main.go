@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -51,36 +52,9 @@ func main() {
 		}
 
 	case "export":
-		jrn, err := conf.ImportJournal(".")
-		if err != nil {
+		if err := ExportJournal(conf); err != nil {
 			log.Fatal(err)
 		}
-
-		url := os.Args[2]
-		user := os.Args[3]
-		pass := os.Args[4]
-		if user == "" || pass == "" {
-			log.Fatal("need both url, user and password")
-		}
-		if !strings.HasPrefix(url, "https://") {
-			log.Fatal(`the url must use https (so must start with "https://")`)
-		}
-
-		body, err := json.Marshal(jrn)
-		if err != nil {
-			log.Fatal(err)
-		}
-		req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(body))
-		if err != nil {
-			log.Fatal(err)
-		}
-		req.SetBasicAuth(user, pass)
-		req.Header.Set("Content-Type", "text/plain")
-		resp, err := http.DefaultClient.Do(req)
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Printf("post finished with status %d\n", resp.StatusCode)
 
 	case "viewconfig":
 		fmt.Println(conf)
@@ -88,6 +62,46 @@ func main() {
 	default:
 		fmt.Println("unknown command")
 	}
+}
+
+func ExportJournal(conf *Config) error {
+	jrn, err := conf.ImportJournal(".")
+	if err != nil {
+		return err
+	}
+
+	var url, user, pass string
+	flag.StringVar(&url, "url", "", "url to send the journal to")
+	flag.StringVar(&user, "user", "", "username")
+	flag.StringVar(&pass, "pass", "", "password")
+	flag.Parse()
+
+	if user == "" || pass == "" {
+		log.Fatal("need both url, user and password")
+	}
+	if !strings.HasPrefix(url, "https://") {
+		log.Fatal(`the url must use https (so must start with "https://")`)
+	}
+
+	body, err := json.Marshal(jrn)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+
+	req.SetBasicAuth(user, pass)
+	req.Header.Set("Content-Type", "text/plain")
+	if resp, err := http.DefaultClient.Do(req); err != nil {
+		return err
+	} else {
+		fmt.Printf("post finished with status %d\n", resp.StatusCode)
+	}
+
+	return nil
 }
 
 func MakeNewEntry() error {
