@@ -71,7 +71,6 @@ func main() {
 	r.Use(middleware.Recoverer)
 	r.Use(Auth)
 
-	r.Get("/", authTestHandler)
 	r.Post("/", postJournalHandler)
 
 	http.ListenAndServe(fmt.Sprintf(":%d", *port), r)
@@ -122,15 +121,6 @@ func Auth(next http.Handler) http.Handler {
 /*
 // Handlers
 */
-
-func authTestHandler(w http.ResponseWriter, r *http.Request) {
-	_, ok := r.Context().Value(contextKey("user")).(string)
-	if !ok {
-		// Fail spectacularly because they shouldn't be here if they aren't logged in.
-		http.Error(w, "", 500)
-		return
-	}
-}
 
 func postJournalHandler(w http.ResponseWriter, r *http.Request) {
 	userDir, ok := r.Context().Value(CTX_USER).(string)
