@@ -28,6 +28,12 @@ func ReadConfig() (*Config, error) {
 
 	var conf *Config
 	err = json.Unmarshal(bts, &conf)
+
+	// Let's set some defaults.
+	if conf.EditorCommand == "" {
+		conf.EditorCommand = "vim"
+	}
+
 	return conf, err
 }
 
