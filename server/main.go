@@ -15,6 +15,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/ifo/dev.journal/entry"
+	"github.com/ifo/dev.journal/filesystem"
 	"github.com/pressly/lg"
 	"github.com/sirupsen/logrus"
 )
@@ -45,7 +46,7 @@ func main() {
 	}
 
 	// Ensure logging directory exists.
-	if err := os.Mkdir("logs", os.ModePerm); err != nil && !os.IsExist(err) {
+	if err := filesystem.EnsureFolderExists("logs"); err != nil {
 		log.Fatalf("error making directory: %v", err)
 	}
 	f, err := os.OpenFile("logs/server.logs", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
@@ -58,7 +59,7 @@ func main() {
 	logger.Out = f
 
 	// Ensure the file database directory exists.
-	if err := os.Mkdir(journalDir, os.ModePerm); err != nil && !os.IsExist(err) {
+	if err := filesystem.EnsureFolderExists(journalDir); err != nil {
 		log.Fatalf("error making directory: %v", err)
 	}
 
@@ -124,6 +125,11 @@ func Auth(next http.Handler) http.Handler {
 
 func postJournalHandler(w http.ResponseWriter, r *http.Request) {
 	userDir := r.Context().Value(CTX_USER).(string)
+	// Ensure userDir exists.
+	if err := filesystem.EnsureFolderExists(filepath.Join(journalDir, userDir)); err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
 
 	// Decode the entries.
 	var journal entry.Journal
@@ -135,14 +141,9 @@ func postJournalHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	// Ensure userDir exists.
-	if err := os.Mkdir(filepath.Join(journalDir, userDir), os.ModePerm); err != nil && !os.IsExist(err) {
-		http.Error(w, err.Error(), 500)
-		return
-	}
 	for dir, e := range journal.Entries {
 		newDir := filepath.Join(journalDir, userDir, dir)
-		if err := os.Mkdir(newDir, os.ModePerm); err != nil && !os.IsExist(err) {
+		if err := filesystem.EnsureFolderExists(newDir); err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}
