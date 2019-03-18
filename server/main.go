@@ -83,8 +83,8 @@ func main() {
 
 type contextKey string
 
-var CTX_USER = contextKey("user")
-var CTX_PASS = contextKey("pass")
+var userKey = contextKey("user")
+var passKey = contextKey("pass")
 
 /*
 // Middleware
@@ -94,8 +94,8 @@ var CTX_PASS = contextKey("pass")
 func CreateBaseContext(user, pass string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			ctx := context.WithValue(r.Context(), CTX_PASS, pass)
-			ctx = context.WithValue(ctx, CTX_USER, user)
+			ctx := context.WithValue(r.Context(), passKey, pass)
+			ctx = context.WithValue(ctx, userKey, user)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
@@ -109,8 +109,8 @@ func Auth(next http.Handler) http.Handler {
 			http.Error(w, "no credentials provided", 401)
 			return
 		}
-		ctxUser := r.Context().Value(CTX_USER).(string)
-		ctxPass := r.Context().Value(CTX_PASS).(string)
+		ctxUser := r.Context().Value(userKey).(string)
+		ctxPass := r.Context().Value(passKey).(string)
 		if user != ctxUser || pass != ctxPass {
 			http.Error(w, "not authorized", 403)
 			return
@@ -124,7 +124,7 @@ func Auth(next http.Handler) http.Handler {
 */
 
 func postJournalHandler(w http.ResponseWriter, r *http.Request) {
-	userDir := r.Context().Value(CTX_USER).(string)
+	userDir := r.Context().Value(userKey).(string)
 	// Ensure userDir exists.
 	if err := filesystem.EnsureFolderExists(filepath.Join(journalDir, userDir)); err != nil {
 		http.Error(w, err.Error(), 500)
