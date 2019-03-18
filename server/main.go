@@ -123,12 +123,7 @@ func Auth(next http.Handler) http.Handler {
 */
 
 func postJournalHandler(w http.ResponseWriter, r *http.Request) {
-	userDir, ok := r.Context().Value(CTX_USER).(string)
-	if !ok {
-		// Fail spectacularly because they shouldn't be here if they aren't logged in.
-		http.Error(w, "", 500)
-		return
-	}
+	userDir := r.Context().Value(CTX_USER).(string)
 
 	// Decode the entries.
 	var journal entry.Journal
