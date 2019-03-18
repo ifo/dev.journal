@@ -77,7 +77,7 @@ func EnsureFolderExists(folder string) error {
 	return nil
 }
 
-func WriteFile(s string, path string) error {
+func SafeWriteFile(path string, s string) error {
 	if _, err := os.Stat(path); !os.IsNotExist(err) {
 		return fmt.Errorf("file at path: %s already exists", path)
 	}

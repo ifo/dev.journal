@@ -123,5 +123,5 @@ func MakeNewEntry() error {
 		return err
 	}
 
-	return filesystem.WriteFile(contents, filepath.Join(folder, file))
+	return filesystem.SafeWriteFile(contents, filepath.Join(folder, file))
 }

@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -148,14 +147,14 @@ func postJournalHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		// Export the entry.
-		err := ioutil.WriteFile(filepath.Join(newDir, fmt.Sprintf("%s.md", dir)), []byte(e.Export()), 0644)
+		err := filesystem.SafeWriteFile(filepath.Join(newDir, fmt.Sprintf("%s.md", dir)), e.Export())
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}
 		// Export any public files.
 		for name, contents := range e.PublicFiles {
-			err = ioutil.WriteFile(filepath.Join(newDir, name), contents, 0644)
+			err = filesystem.SafeWriteFile(filepath.Join(newDir, name), string(contents))
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 				return
