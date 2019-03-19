@@ -21,6 +21,12 @@ import (
 
 const journalDir = "journals"
 
+// Functions overwriteable for testing purposes.
+var (
+	folderCreator = filesystem.EnsureFolderExists
+	fileWriter    = filesystem.SafeWriteFile
+)
+
 func main() {
 	// Setup
 	// Get the server port.
@@ -125,7 +131,7 @@ func Auth(next http.Handler) http.Handler {
 func postJournalHandler(w http.ResponseWriter, r *http.Request) {
 	userDir := r.Context().Value(userKey).(string)
 	// Ensure userDir exists.
-	if err := filesystem.EnsureFolderExists(filepath.Join(journalDir, userDir)); err != nil {
+	if err := folderCreator(filepath.Join(journalDir, userDir)); err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
@@ -142,19 +148,19 @@ func postJournalHandler(w http.ResponseWriter, r *http.Request) {
 
 	for dir, e := range journal.Entries {
 		newDir := filepath.Join(journalDir, userDir, dir)
-		if err := filesystem.EnsureFolderExists(newDir); err != nil {
+		if err := folderCreator(newDir); err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}
 		// Export the entry.
-		err := filesystem.SafeWriteFile(filepath.Join(newDir, fmt.Sprintf("%s.md", dir)), e.Export())
+		err := fileWriter(filepath.Join(newDir, fmt.Sprintf("%s.md", dir)), e.Export())
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}
 		// Export any public files.
 		for name, contents := range e.PublicFiles {
-			err = filesystem.SafeWriteFile(filepath.Join(newDir, name), string(contents))
+			err = fileWriter(filepath.Join(newDir, name), string(contents))
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 				return
