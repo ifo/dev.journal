@@ -38,16 +38,7 @@ func main() {
 		fmt.Println("new entry created")
 
 	case "edit":
-		pe := filesystem.Latest()
-		if pe == "" {
-			fmt.Println("no entry to edit")
-			return
-		}
-		cmd := exec.Command(conf.EditorCommand, pe)
-		cmd.Stdin = os.Stdin
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		if err := cmd.Run(); err != nil {
+		if err := EditEntry(conf); err != nil {
 			log.Fatal(err)
 		}
 
@@ -55,6 +46,7 @@ func main() {
 		if err := ExportJournal(conf); err != nil {
 			log.Fatal(err)
 		}
+		fmt.Println("journal export complete")
 
 	case "viewconfig":
 		fmt.Println(conf)
@@ -124,4 +116,16 @@ func MakeNewEntry() error {
 	}
 
 	return filesystem.SafeWriteFile(contents, filepath.Join(folder, file))
+}
+
+func EditEntry(conf *Config) error {
+	pe := filesystem.Latest()
+	if pe == "" {
+		return fmt.Errorf("no entry to edit")
+	}
+	cmd := exec.Command(conf.EditorCommand, pe)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
 }
