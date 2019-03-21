@@ -115,7 +115,7 @@ func MakeNewEntry() error {
 		return err
 	}
 
-	return filesystem.SafeWriteFile(contents, filepath.Join(folder, file))
+	return filesystem.SafeWriteFile(filepath.Join(folder, file), contents)
 }
 
 func EditEntry(conf *Config) error {
