@@ -12,7 +12,7 @@ import (
 )
 
 func TestPostJournalHandler(t *testing.T) {
-	defer teardown()
+	defer resetFileSystem()
 
 	// Overwrite the functions
 	folderCreator = FakeCreateFolder
@@ -34,8 +34,7 @@ func TestPostJournalHandler(t *testing.T) {
 
 var fileSystem = map[string]string{}
 
-func teardown() {
-	// Reset the "file system"
+func resetFileSystem() {
 	fileSystem = map[string]string{}
 }
 
