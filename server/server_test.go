@@ -12,6 +12,19 @@ import (
 )
 
 func TestAuth(t *testing.T) {
+	tests := []struct {
+		BasicAuth  bool
+		User       string
+		Pass       string
+		StatusCode int
+	}{
+		{BasicAuth: true, User: "user", Pass: "notpass", StatusCode: http.StatusForbidden},
+		{BasicAuth: true, User: "notuser", Pass: "pass", StatusCode: http.StatusForbidden},
+		{BasicAuth: true, User: "notuser", Pass: "notpass", StatusCode: http.StatusForbidden},
+		{BasicAuth: false, User: "", Pass: "", StatusCode: http.StatusUnauthorized},
+		{BasicAuth: true, User: "user", Pass: "pass", StatusCode: http.StatusOK},
+	}
+
 	user := "user"
 	pass := "pass"
 
@@ -19,15 +32,19 @@ func TestAuth(t *testing.T) {
 		CreateBaseContext(user, pass)(Auth(GetEmptyHandler())))
 	defer ts.Close()
 
-	req, _ := http.NewRequest(http.MethodPost, ts.URL, nil)
-	req.SetBasicAuth("notuser", "notpass")
+	for _, test := range tests {
+		req, _ := http.NewRequest(http.MethodPost, ts.URL, nil)
+		if test.BasicAuth {
+			req.SetBasicAuth(test.User, test.Pass)
+		}
 
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if resp.StatusCode != http.StatusForbidden {
-		t.Errorf("got %d status, expected %d\n", resp.StatusCode, http.StatusForbidden)
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if resp.StatusCode != test.StatusCode {
+			t.Errorf("got %d status, expected %d\n", resp.StatusCode, test.StatusCode)
+		}
 	}
 }
 
