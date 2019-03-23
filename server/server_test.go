@@ -11,6 +11,26 @@ import (
 	"github.com/ifo/dev.journal/entry"
 )
 
+func TestAuth(t *testing.T) {
+	user := "user"
+	pass := "pass"
+
+	ts := httptest.NewServer(
+		CreateBaseContext(user, pass)(Auth(GetEmptyHandler())))
+	defer ts.Close()
+
+	req, _ := http.NewRequest(http.MethodPost, ts.URL, nil)
+	req.SetBasicAuth("notuser", "notpass")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if resp.StatusCode != http.StatusForbidden {
+		t.Errorf("got %d status, expected %d\n", resp.StatusCode, http.StatusForbidden)
+	}
+}
+
 func TestPostJournalHandler(t *testing.T) {
 	defer resetFileSystem()
 
@@ -45,4 +65,8 @@ func FakeCreateFolder(folder string) error {
 func FakeWriteFile(path string, s string) error {
 	fileSystem[path] = s
 	return nil
+}
+
+func GetEmptyHandler() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {})
 }
