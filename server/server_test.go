@@ -11,6 +11,39 @@ import (
 	"github.com/ifo/dev.journal/entry"
 )
 
+func TestCreateBaseContext(t *testing.T) {
+	user := "user"
+	pass := "pass"
+
+	called := false
+	contextHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctxUser := r.Context().Value(userKey).(string)
+		if ctxUser != user {
+			t.Errorf("got %v expected %s", ctxUser, user)
+		}
+
+		ctxPass := r.Context().Value(passKey).(string)
+		if ctxPass != pass {
+			t.Errorf("got %v expected %s", ctxPass, pass)
+		}
+
+		called = true
+	})
+
+	ts := httptest.NewServer(
+		CreateBaseContext(user, pass)(contextHandler))
+	defer ts.Close()
+
+	// Make a request call the tests.
+	req, _ := http.NewRequest(http.MethodPost, ts.URL, nil)
+	http.DefaultClient.Do(req)
+
+	// Ensure things actually ran.
+	if !called {
+		t.Errorf("context checking tests were not run")
+	}
+}
+
 func TestAuth(t *testing.T) {
 	tests := []struct {
 		BasicAuth  bool
