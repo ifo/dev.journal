@@ -28,26 +28,9 @@ var (
 )
 
 func main() {
-	// Setup
-	// Get the server port.
-	portStr := os.Getenv("DEVJ_PORT")
-	portDefault := 3000
-	var err error
-	if portStr != "" {
-		portDefault, err = strconv.Atoi(portStr)
-	}
+	cfg, err := Setup()
 	if err != nil {
 		log.Fatal(err)
-	}
-	port := flag.Int("port", portDefault, "Port to run the server on")
-	user := flag.String("u", os.Getenv("DEVJ_USER"), "The user")
-	pass := flag.String("p", os.Getenv("DEVJ_PASSWORD"), "The user's password")
-
-	flag.Parse()
-
-	// TODO: allow for more than one user
-	if *user == "" || *pass == "" {
-		log.Fatalln("Both user and password must be non-empty")
 	}
 
 	// Ensure logging directory exists.
@@ -70,7 +53,7 @@ func main() {
 
 	r := chi.NewRouter()
 
-	r.Use(CreateBaseContext(*user, *pass))
+	r.Use(CreateBaseContext(cfg.User, cfg.Password))
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 	r.Use(lg.RequestLogger(logger))
@@ -79,12 +62,44 @@ func main() {
 
 	r.Post("/", postJournalHandler)
 
-	http.ListenAndServe(fmt.Sprintf(":%d", *port), r)
+	http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), r)
+}
+
+func Setup() (ServerConfig, error) {
+	// Setup
+	// Get the server port.
+	portStr := os.Getenv("DEVJ_PORT")
+	portDefault := 3000
+	var err error
+	if portStr != "" {
+		portDefault, err = strconv.Atoi(portStr)
+	}
+	if err != nil {
+		return ServerConfig{}, err
+	}
+	port := flag.Int("port", portDefault, "Port to run the server on")
+	user := flag.String("u", os.Getenv("DEVJ_USER"), "The user")
+	pass := flag.String("p", os.Getenv("DEVJ_PASSWORD"), "The user's password")
+
+	flag.Parse()
+
+	// TODO: allow for more than one user
+	if *user == "" || *pass == "" {
+		return ServerConfig{}, fmt.Errorf("Both user and password must be non-empty")
+	}
+
+	return ServerConfig{User: *user, Password: *pass, Port: *port}, nil
 }
 
 /*
 // Types and Constants
 */
+
+type ServerConfig struct {
+	User     string
+	Password string
+	Port     int
+}
 
 type contextKey string
 
