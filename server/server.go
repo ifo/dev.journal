@@ -30,21 +30,13 @@ var (
 func main() {
 	cfg, err := Setup()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
 
-	// Ensure logging directory exists.
-	if err := filesystem.EnsureFolderExists("logs"); err != nil {
-		log.Fatalf("error making directory: %v", err)
-	}
-	f, err := os.OpenFile("logs/server.logs", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
+	logger, err := SetupLogger()
 	if err != nil {
-		log.Fatalf("error opening file: %v", err)
+		log.Fatalln(err)
 	}
-	defer f.Close()
-
-	logger := logrus.New()
-	logger.Out = f
 
 	// Ensure the file database directory exists.
 	if err := filesystem.EnsureFolderExists(journalDir); err != nil {
@@ -66,7 +58,6 @@ func main() {
 }
 
 func Setup() (ServerConfig, error) {
-	// Setup
 	// Get the server port.
 	portStr := os.Getenv("DEVJ_PORT")
 	portDefault := 3000
@@ -89,6 +80,22 @@ func Setup() (ServerConfig, error) {
 	}
 
 	return ServerConfig{User: *user, Password: *pass, Port: *port}, nil
+}
+
+// SetupLogger ensures a logging directory and file exists, and then sets up Logrus.
+func SetupLogger() (*logrus.Logger, error) {
+	// Ensure logging directory exists.
+	if err := filesystem.EnsureFolderExists("logs"); err != nil {
+		return nil, fmt.Errorf("error making directory: %v", err)
+	}
+	f, err := os.OpenFile("logs/server.logs", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
+	if err != nil {
+		return nil, fmt.Errorf("error opening file: %v", err)
+	}
+
+	logger := logrus.New()
+	logger.Out = f
+	return logger, nil
 }
 
 /*
