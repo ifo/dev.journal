@@ -8,43 +8,8 @@ import (
 
 const testFail = `Actual: "%+v" Expected: "%+v" Case: %q`
 
-func TestEntryExport(t *testing.T) {
-	cases := map[string]struct {
-		E   Entry
-		Out string
-	}{
-		// Pound titles.
-		"default entry": {E: Default, Out: "# Do\n\n\n\n# Learn\n\n\n"},
-		"empty entry":   {E: Entry{Style: Pound, Sections: nil}, Out: ""},
-		"section with body": {
-			E:   Entry{Style: Pound, Sections: []Section{{Title: "Five", Body: "teve"}}},
-			Out: "# Five\n\nteve\n"},
-		"two sections with body": {
-			E: Entry{Style: Pound,
-				Sections: []Section{{Title: "Five", Body: "teve"}, {Title: "Four", Body: "too"}}},
-			Out: "# Five\n\nteve\n\n# Four\n\ntoo\n"},
-		// Underline titles.
-		"ul default entry": {E: DefaultUnderline, Out: "Do\n==\n\n\n\nLearn\n=====\n\n\n"},
-		"ul empty entry":   {E: Entry{Style: Underline, Sections: nil}, Out: ""},
-		"ul section with body": {
-			E:   Entry{Style: Underline, Sections: []Section{{Title: "Five", Body: "teve"}}},
-			Out: "Five\n====\n\nteve\n"},
-		"ul two sections with body": {
-			E: Entry{Style: Underline,
-				Sections: []Section{{Title: "Five", Body: "teve"}, {Title: "Four", Body: "too"}}},
-			Out: "Five\n====\n\nteve\n\nFour\n====\n\ntoo\n"},
-	}
-
-	for id, c := range cases {
-		exp := c.E.Export()
-		if exp != c.Out {
-			t.Errorf(testFail, exp, c.Out, id)
-		}
-	}
-}
-
-func TestEntryImport(t *testing.T) {
-	cases := map[string]struct {
+func TestImport(t *testing.T) {
+	tests := map[string]struct {
 		In  string
 		E   Entry
 		Err error
@@ -103,13 +68,48 @@ func TestEntryImport(t *testing.T) {
 			Err: nil},
 	}
 
-	for id, c := range cases {
-		ent, err := Import(c.In)
-		if !reflect.DeepEqual(ent, c.E) {
-			t.Errorf(testFail, ent, c.E, id)
+	for id, test := range tests {
+		ent, err := Import(test.In)
+		if !reflect.DeepEqual(ent, test.E) {
+			t.Errorf(testFail, ent, test.E, id)
 		}
-		if !errorEqual(err, c.Err) {
-			t.Errorf(testFail, err, c.Err, id)
+		if !errorEqual(err, test.Err) {
+			t.Errorf(testFail, err, test.Err, id)
+		}
+	}
+}
+
+func TestEntry_Export(t *testing.T) {
+	tests := map[string]struct {
+		E   Entry
+		Out string
+	}{
+		// Pound titles.
+		"default entry": {E: Default, Out: "# Do\n\n\n\n# Learn\n\n\n"},
+		"empty entry":   {E: Entry{Style: Pound, Sections: nil}, Out: ""},
+		"section with body": {
+			E:   Entry{Style: Pound, Sections: []Section{{Title: "Five", Body: "teve"}}},
+			Out: "# Five\n\nteve\n"},
+		"two sections with body": {
+			E: Entry{Style: Pound,
+				Sections: []Section{{Title: "Five", Body: "teve"}, {Title: "Four", Body: "too"}}},
+			Out: "# Five\n\nteve\n\n# Four\n\ntoo\n"},
+		// Underline titles.
+		"ul default entry": {E: DefaultUnderline, Out: "Do\n==\n\n\n\nLearn\n=====\n\n\n"},
+		"ul empty entry":   {E: Entry{Style: Underline, Sections: nil}, Out: ""},
+		"ul section with body": {
+			E:   Entry{Style: Underline, Sections: []Section{{Title: "Five", Body: "teve"}}},
+			Out: "Five\n====\n\nteve\n"},
+		"ul two sections with body": {
+			E: Entry{Style: Underline,
+				Sections: []Section{{Title: "Five", Body: "teve"}, {Title: "Four", Body: "too"}}},
+			Out: "Five\n====\n\nteve\n\nFour\n====\n\ntoo\n"},
+	}
+
+	for id, test := range tests {
+		exp := test.E.Export()
+		if exp != test.Out {
+			t.Errorf(testFail, exp, test.Out, id)
 		}
 	}
 }

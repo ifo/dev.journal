@@ -59,23 +59,14 @@ func (s Style) MarshalJSON() ([]byte, error) {
 	return nil, fmt.Errorf("Unrecognized Style: %+v", s)
 }
 
+// Default is an unnamed Entry used as a template when no others exist.
+// It uses the Pound style for headings.
 var Default = Entry{Style: Pound, Sections: []Section{{Title: "Do"}, {Title: "Learn"}}}
-var DefaultUnderline = Entry{Style: Underline,
-	Sections: []Section{{Title: "Do"}, {Title: "Learn"}}}
 
-func (e Entry) Export() string {
-	out := ""
-	for i, s := range e.Sections {
-		if i != 0 {
-			out += "\n"
-		}
-		if e.Style == Pound {
-			out += fmt.Sprintf("# %s\n\n%s\n", s.Title, s.Body)
-		} else if e.Style == Underline {
-			out += fmt.Sprintf("%s\n%s\n\n%s\n", s.Title, strings.Repeat("=", len(s.Title)), s.Body)
-		}
-	}
-	return out
+// DefaultUnderline is an unnamed Entry used as a template when no others exist.
+// It uses the Underline style for headings, and will only be used if a user specifies the Underline preference.
+var DefaultUnderline = Entry{
+	Style: Underline, Sections: []Section{{Title: "Do"}, {Title: "Learn"}},
 }
 
 func Import(str string) (Entry, error) {
@@ -180,12 +171,19 @@ func importUnderlineTitles(str string, pubSections map[string]struct{}) (Entry, 
 	return e, nil
 }
 
-// Two lines are a title if there is at least 1 non space rune on the first line
-// and the 2nd line is more than 1 "=" sign, and entirely "=" signs.
-func areTitle(line1, line2 string) bool {
-	return len(strings.Replace(line1, " ", "", -1)) > 0 &&
-		len(line2) > 0 &&
-		len(strings.Replace(line2, "=", "", -1)) == 0
+func (e Entry) Export() string {
+	out := ""
+	for i, s := range e.Sections {
+		if i != 0 {
+			out += "\n"
+		}
+		if e.Style == Pound {
+			out += fmt.Sprintf("# %s\n\n%s\n", s.Title, s.Body)
+		} else if e.Style == Underline {
+			out += fmt.Sprintf("%s\n%s\n\n%s\n", s.Title, strings.Repeat("=", len(s.Title)), s.Body)
+		}
+	}
+	return out
 }
 
 func (e *Entry) ImportFiles(
@@ -221,7 +219,7 @@ func (e Entry) publicFileList(pubSections map[string]struct{}) []string {
 	return expFileList
 }
 
-// Contains is a very expensive way of determining if a journal already has a specific entry.
+// Contains is an expensive way of determining if a journal already has a specific entry.
 func (j *Journal) Contains(e Entry) bool {
 	for _, entry := range j.Entries {
 		if reflect.DeepEqual(entry, e) {
@@ -229,4 +227,12 @@ func (j *Journal) Contains(e Entry) bool {
 		}
 	}
 	return false
+}
+
+// Two lines are a title if there is at least 1 non space rune on the first line
+// and the 2nd line is more than 1 "=" sign, and entirely "=" signs.
+func areTitle(line1, line2 string) bool {
+	return len(strings.Replace(line1, " ", "", -1)) > 0 &&
+		len(line2) > 0 &&
+		len(strings.Replace(line2, "=", "", -1)) == 0
 }
