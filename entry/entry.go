@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"path/filepath"
+	"reflect"
 	"strings"
 )
 
@@ -218,4 +219,14 @@ func (e Entry) publicFileList(pubSections map[string]struct{}) []string {
 		}
 	}
 	return expFileList
+}
+
+// Contains is a very expensive way of determining if a journal already has a specific entry.
+func (j *Journal) Contains(e Entry) bool {
+	for _, entry := range j.Entries {
+		if reflect.DeepEqual(entry, e) {
+			return true
+		}
+	}
+	return false
 }
