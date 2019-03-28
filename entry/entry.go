@@ -15,12 +15,19 @@ const (
 	Underline
 )
 
+// EntryName is the name of an entry.
+// Usually, this is the date the Entry was made.
+type EntryName string
+
 // Journal is a map of Entries where they key is the string of the date the Entry was written.
 type Journal struct {
-	Entries map[string]Entry `json:"entries"`
+	Entries map[EntryName]Entry `json:"entries"`
 }
 
+// Entry contains the sections and other files related to a journal entry.
+// An Entry may not have a name, but will as soon as it has a date it has been created on.
 type Entry struct {
+	Name        EntryName           `json:"name"`
 	Sections    []Section           `json:"sections"`
 	Style       Style               `json:"style"`
 	PublicFiles map[string][]byte   `json:"files"`
