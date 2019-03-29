@@ -230,6 +230,19 @@ func (e Entry) publicFileList(pubSections map[string]struct{}) []string {
 	return expFileList
 }
 
+func (j *Journal) Add(e Entry) {
+	if existing, exists := j.Entries[e.Name]; exists {
+		if !e.Equals(existing) {
+			// TODO: a better updated version naming scheme.
+			e.Name = e.Name + "1"
+			j.Add(e)
+		}
+		return
+	}
+
+	j.Entries[e.Name] = e
+}
+
 // Contains is an expensive way of determining if a journal already has a specific entry.
 func (j *Journal) Contains(e Entry) bool {
 	for _, entry := range j.Entries {
