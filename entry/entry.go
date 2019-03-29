@@ -211,6 +211,10 @@ func (e *Entry) ImportFiles(
 	return nil
 }
 
+func (e Entry) Equals(e2 Entry) bool {
+	return reflect.DeepEqual(e, e2)
+}
+
 func (e Entry) publicFileList(pubSections map[string]struct{}) []string {
 	var expFileList []string
 	for _, s := range e.Sections {
@@ -229,7 +233,7 @@ func (e Entry) publicFileList(pubSections map[string]struct{}) []string {
 // Contains is an expensive way of determining if a journal already has a specific entry.
 func (j *Journal) Contains(e Entry) bool {
 	for _, entry := range j.Entries {
-		if reflect.DeepEqual(entry, e) {
+		if entry.Equals(e) {
 			return true
 		}
 	}
