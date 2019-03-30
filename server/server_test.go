@@ -97,23 +97,23 @@ func TestPostJournalHandler(t *testing.T) {
 	postJournalHandler(recorder, request)
 
 	file := fileSystem["journals/user/2019-03-19/2019-03-19.md"]
-	if file != entry.Default.Export() {
-		t.Errorf("Got %s,\n\nexpected %s\n", file, entry.Default.Export())
+	if string(file) != entry.Default.Export() {
+		t.Errorf("Got %s,\n\nexpected %s\n", string(file), entry.Default.Export())
 	}
 }
 
-var fileSystem = map[string]string{}
+var fileSystem = map[string][]byte{}
 
 func resetFileSystem() {
-	fileSystem = map[string]string{}
+	fileSystem = map[string][]byte{}
 }
 
 func FakeCreateFolder(folder string) error {
 	return nil
 }
 
-func FakeWriteFile(path string, s string) error {
-	fileSystem[path] = s
+func FakeWriteFile(path string, b []byte) error {
+	fileSystem[path] = b
 	return nil
 }
 

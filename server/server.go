@@ -175,14 +175,14 @@ func postJournalHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		// Export the entry.
-		err := fileWriter(filepath.Join(newDir, fmt.Sprintf("%s.md", dir)), e.Export())
+		err := fileWriter(filepath.Join(newDir, fmt.Sprintf("%s.md", dir)), []byte(e.Export()))
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}
 		// Export any public files.
 		for name, contents := range e.PublicFiles {
-			err = fileWriter(filepath.Join(newDir, name), string(contents))
+			err = fileWriter(filepath.Join(newDir, name), contents)
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 				return
