@@ -89,7 +89,7 @@ func TestPostJournalHandler(t *testing.T) {
 	fileWriter = FakeWriteFile
 
 	recorder := httptest.NewRecorder()
-	bts, _ := json.Marshal(entry.Journal{Entries: map[string]entry.Entry{"2019-03-19": entry.Default}})
+	bts, _ := json.Marshal(entry.Journal{Entries: map[entry.EntryName]entry.Entry{"2019-03-19": entry.Default}})
 	body := bytes.NewReader(bts)
 	request, _ := http.NewRequest(http.MethodPost, "/", body)
 	request = request.WithContext(context.WithValue(request.Context(), userKey, "user"))

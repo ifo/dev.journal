@@ -59,7 +59,7 @@ func (c *Config) ImportJournal(basePath string) (*entry.Journal, error) {
 	if err != nil {
 		return nil, err
 	}
-	out := &entry.Journal{Entries: map[string]entry.Entry{}}
+	out := &entry.Journal{Entries: map[entry.EntryName]entry.Entry{}}
 	for _, date := range entries {
 		entryDir := filepath.Join(basePath, date)
 		rawEntry, err := filesystem.ReadFile(filepath.Join(entryDir, fmt.Sprintf("%s.md", date)))
@@ -85,7 +85,7 @@ func (c *Config) ImportJournal(basePath string) (*entry.Journal, error) {
 		if err != nil {
 			return nil, err
 		}
-		out.Entries[date] = e
+		out.Entries[entry.EntryName(date)] = e
 	}
 	return out, nil
 }

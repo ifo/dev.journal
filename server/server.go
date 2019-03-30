@@ -169,7 +169,7 @@ func postJournalHandler(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	for dir, e := range journal.Entries {
-		newDir := filepath.Join(journalDir, userDir, dir)
+		newDir := filepath.Join(journalDir, userDir, string(dir))
 		if err := folderCreator(newDir); err != nil {
 			http.Error(w, err.Error(), 500)
 			return
