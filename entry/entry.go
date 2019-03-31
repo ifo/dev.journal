@@ -211,10 +211,6 @@ func (e *Entry) ImportFiles(
 	return nil
 }
 
-func (e Entry) Equals(e2 Entry) bool {
-	return reflect.DeepEqual(e, e2)
-}
-
 func (e Entry) publicFileList(pubSections map[string]struct{}) []string {
 	var expFileList []string
 	for _, s := range e.Sections {
@@ -251,6 +247,10 @@ func (j *Journal) Contains(e Entry) bool {
 		}
 	}
 	return false
+}
+
+func (e Entry) Equals(e2 Entry) bool {
+	return reflect.DeepEqual(e, e2)
 }
 
 // Two lines are a title if there is at least 1 non space rune on the first line
