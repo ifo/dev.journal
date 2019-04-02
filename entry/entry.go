@@ -226,6 +226,11 @@ func (e Entry) publicFileList(pubSections map[string]struct{}) []string {
 	return expFileList
 }
 
+// NewJournal creates a new empty journal with a non-nil Entries map.
+func NewJournal() *Journal {
+	return &Journal{Entries: map[EntryName]Entry{}}
+}
+
 func (j *Journal) Add(e Entry) {
 	if existing, exists := j.Entries[e.Name]; exists {
 		if !e.Equals(existing) {
