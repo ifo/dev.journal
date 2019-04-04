@@ -154,6 +154,45 @@ func TestJournal_Add(t *testing.T) {
 	}
 }
 
+func TestJournal_Contains(t *testing.T) {
+	entry1 := Entry{Name: "2019-01-01"}
+	entry2 := Entry{Name: "2019-01-02"}
+	entry2ul := Entry{Name: "2019-01-02", Style: Underline}
+	entry2ulAdded := Entry{Name: "2019-01-021", Style: Underline}
+	journal1 := NewJournal()
+	journal1.Entries[entry1.Name] = entry1
+	journal2 := NewJournal()
+	journal2.Entries[entry1.Name] = entry1
+	journal2.Entries[entry2.Name] = entry2
+	journal3 := NewJournal()
+	journal3.Entries[entry2.Name] = entry2
+	journal3.Entries[entry2ulAdded.Name] = entry2ulAdded
+
+	tests := map[string]struct {
+		Journal *Journal
+		Entry   Entry
+		Out     bool
+	}{
+		"1": {Journal: journal1, Entry: entry1, Out: true},
+		"2": {Journal: journal1, Entry: entry2, Out: false},
+		"3": {Journal: journal2, Entry: entry1, Out: true},
+		"4": {Journal: journal2, Entry: entry2, Out: true},
+		"5": {Journal: journal2, Entry: entry2ul, Out: false},
+		"6": {Journal: journal3, Entry: entry1, Out: false},
+		"7": {Journal: journal3, Entry: entry2, Out: true},
+		// TODO: Fix this case in the Equals function,
+		// having everything the same except for the name should still be the same.
+		//"8": {Journal: journal3, Entry: entry2ul, Out: true},
+	}
+
+	for id, test := range tests {
+		out := test.Journal.Contains(test.Entry)
+		if out != test.Out {
+			t.Errorf(testFail, out, test.Out, id)
+		}
+	}
+}
+
 func errorEqual(e1, e2 error) bool {
 	if e1 == nil && e2 == nil {
 		return true
