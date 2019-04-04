@@ -254,7 +254,9 @@ func (j *Journal) Contains(e Entry) bool {
 	return false
 }
 
+// Equals tests the equality of two entries, without regard to their names.
 func (e Entry) Equals(e2 Entry) bool {
+	e.Name, e2.Name = "", ""
 	return reflect.DeepEqual(e, e2)
 }
 

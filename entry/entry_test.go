@@ -155,10 +155,12 @@ func TestJournal_Add(t *testing.T) {
 }
 
 func TestJournal_Contains(t *testing.T) {
-	entry1 := Entry{Name: "2019-01-01"}
-	entry2 := Entry{Name: "2019-01-02"}
-	entry2ul := Entry{Name: "2019-01-02", Style: Underline}
-	entry2ulAdded := Entry{Name: "2019-01-021", Style: Underline}
+	sections1 := []Section{{Title: "title1"}}
+	sections2 := []Section{{Title: "title2"}}
+	entry1 := Entry{Name: "2019-01-01", Sections: sections1}
+	entry2 := Entry{Name: "2019-01-02", Sections: sections2}
+	entry2ul := Entry{Name: "2019-01-02", Sections: sections2, Style: Underline}
+	entry2ulAdded := Entry{Name: "2019-01-021", Sections: sections2, Style: Underline}
 	journal1 := NewJournal()
 	journal1.Entries[entry1.Name] = entry1
 	journal2 := NewJournal()
@@ -180,9 +182,7 @@ func TestJournal_Contains(t *testing.T) {
 		"5": {Journal: journal2, Entry: entry2ul, Out: false},
 		"6": {Journal: journal3, Entry: entry1, Out: false},
 		"7": {Journal: journal3, Entry: entry2, Out: true},
-		// TODO: Fix this case in the Equals function,
-		// having everything the same except for the name should still be the same.
-		//"8": {Journal: journal3, Entry: entry2ul, Out: true},
+		"8": {Journal: journal3, Entry: entry2ul, Out: true},
 	}
 
 	for id, test := range tests {
