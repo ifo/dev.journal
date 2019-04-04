@@ -131,15 +131,15 @@ func TestJournal_Add(t *testing.T) {
 	outJournal3.Entries[entry2ulAdded.Name] = entry2ulAdded
 	outJournal3.Entries[entry2diffAdded.Name] = entry2diffAdded
 
-	tests := []struct {
+	tests := map[string]struct {
 		ToAdd      []Entry
 		OutJournal *Journal
 	}{
-		{ToAdd: []Entry{entry1}, OutJournal: outJournal1},
-		{ToAdd: []Entry{entry1, entry1}, OutJournal: outJournal1},
-		{ToAdd: []Entry{entry1, entry2}, OutJournal: outJournal2},
-		{ToAdd: []Entry{entry1, entry2, entry1}, OutJournal: outJournal2},
-		{ToAdd: []Entry{entry2, entry2ul, entry2diff}, OutJournal: outJournal3},
+		"1": {ToAdd: []Entry{entry1}, OutJournal: outJournal1},
+		"2": {ToAdd: []Entry{entry1, entry1}, OutJournal: outJournal1},
+		"3": {ToAdd: []Entry{entry1, entry2}, OutJournal: outJournal2},
+		"4": {ToAdd: []Entry{entry1, entry2, entry1}, OutJournal: outJournal2},
+		"5": {ToAdd: []Entry{entry2, entry2ul, entry2diff}, OutJournal: outJournal3},
 	}
 
 	for id, test := range tests {
