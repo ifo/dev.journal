@@ -114,6 +114,30 @@ func TestEntry_Export(t *testing.T) {
 	}
 }
 
+func TestEntry_Equals(t *testing.T) {
+	entry1 := Entry{Name: "2019-01-01"}
+	entry2 := Entry{Name: "2019-01-02"}
+	entry2ul := Entry{Name: "2019-01-02", Style: Underline}
+
+	tests := map[string]struct {
+		E1     Entry
+		E2     Entry
+		Result bool
+	}{
+		"1": {E1: Default, E2: DefaultUnderline, Result: false},
+		"2": {E1: entry1, E2: entry2, Result: true},
+		"3": {E1: entry1, E2: entry2ul, Result: false},
+		"4": {E1: entry2, E2: entry2ul, Result: false},
+	}
+
+	for id, test := range tests {
+		result := test.E1.Equals(test.E2)
+		if result != test.Result {
+			t.Errorf(testFail, result, test.Result, id)
+		}
+	}
+}
+
 func errorEqual(e1, e2 error) bool {
 	if e1 == nil && e2 == nil {
 		return true
